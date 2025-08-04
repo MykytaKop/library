@@ -1,3 +1,4 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 class Book(models.Model):
@@ -15,5 +16,20 @@ class Book(models.Model):
 
     def __str__(self):
         return self.title
+
+class User(AbstractUser):
+    pass
+
+
+class Borrowing(models.Model):
+    borrow_date = models.DateField(auto_now_add=True)
+    expected_return_date = models.DateField()
+    actual_return_date = models.DateField(null=True, blank=True)
+
+    book = models.ForeignKey("Book", on_delete=models.CASCADE)
+    user = models.ForeignKey("User", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user} borrowed {self.book} on {self.borrow_date}"
 
 
