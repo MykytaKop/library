@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.admin",
     "rest_framework",
     "library",
+    "user",
 ]
 
 MIDDLEWARE = [
@@ -123,4 +124,4 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-AUTH_USER_MODEL = 'library.User'
+AUTH_USER_MODEL = 'user.User'
