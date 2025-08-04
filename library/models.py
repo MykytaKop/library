@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from user.models import User
 
 
 class Book(models.Model):
@@ -14,10 +15,6 @@ class Book(models.Model):
 
     def __str__(self):
         return self.title
-
-
-class User(AbstractUser):
-    pass
 
 
 class Borrowing(models.Model):
