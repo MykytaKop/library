@@ -24,6 +24,14 @@ class Borrowing(models.Model):
 
     book = models.ForeignKey("Book", on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
+
+    def save(self, *args, **kwargs):
+        if self.actual_return_date:
+            self.is_active = False
+        else:
+            self.is_active = True
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.user} borrowed {self.book} on {self.borrow_date}"
