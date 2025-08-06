@@ -61,8 +61,7 @@ class BorrowingListView(viewsets.ModelViewSet):
 
         if borrowing.actual_return_date:
             return Response(
-                {"detail": "Book already returned."},
-                status=status.HTTP_400_BAD_REQUEST
+                {"detail": "Book already returned."}, status=status.HTTP_400_BAD_REQUEST
             )
 
         borrowing.actual_return_date = serializer.validated_data["actual_return_date"]
@@ -73,8 +72,7 @@ class BorrowingListView(viewsets.ModelViewSet):
         borrowing.save()
 
         return Response(
-            {"detail": "Book returned successfully."},
-            status=status.HTTP_200_OK
+            {"detail": "Book returned successfully."}, status=status.HTTP_200_OK
         )
 
     def get_queryset(self):
