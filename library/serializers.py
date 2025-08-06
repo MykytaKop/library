@@ -10,7 +10,7 @@ class BookSerializer(serializers.ModelSerializer):
         fields = ["id", "title", "author", "cover", "inventory"]
 
 
-class BrowningListSerializer(serializers.ModelSerializer):
+class BorrowingListSerializer(serializers.ModelSerializer):
     book = BookSerializer()
     user = UserSerializer()
 

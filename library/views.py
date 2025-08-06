@@ -1,4 +1,5 @@
 from django.utils import timezone
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -11,7 +12,7 @@ from .permissions import IsAdminOrIfAuthenticatedReadOnly
 from library.models import Book, Borrowing
 from library.serializers import (
     BookSerializer,
-    BrowningListSerializer,
+    BorrowingListSerializer,
     BorrowingSerializerPost,
     BorrowingSerializerUpdate,
 )
@@ -27,11 +28,29 @@ class BorrowingListView(viewsets.ModelViewSet):
     queryset = Borrowing.objects.all()
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        borrowing = Borrowing.objects.all()
+        is_active_filter = self.request.query_params.get("is_active")
+
+        if is_active_filter and is_active_filter.lower() == "true":
+            borrowing = borrowing.filter(is_active=True)
+        elif is_active_filter and is_active_filter.lower() == "false":
+            borrowing = borrowing.filter(is_active=False)
+
+        if self.request.user.is_staff:
+            user_id_filter = self.request.query_params.get("user_id")
+            if user_id_filter:
+                try:
+                    borrowing = borrowing.filter(user=int(user_id_filter))
+                except Exception as w:
+                    raise ValidationError(w)
+        return borrowing
+
     def get_serializer_class(self):
         if self.action == "return_book":
             return BorrowingSerializerUpdate
         elif self.request.method == "GET":
-            return BrowningListSerializer
+            return BorrowingListSerializer
         elif self.request.method == "POST":
             return BorrowingSerializerPost
         return BorrowingSerializerUpdate
@@ -75,18 +94,18 @@ class BorrowingListView(viewsets.ModelViewSet):
             {"detail": "Book returned successfully."}, status=status.HTTP_200_OK
         )
 
-    def get_queryset(self):
-        borrowing = Borrowing.objects.all()
-        is_active_filter = self.request.query_params.get("is_active")
-        user_id_filter = self.request.query_params.get("user_id")
-
-        if is_active_filter:
-            borrowing = borrowing.filter(is_active=is_active_filter.capitalize())
-
-        if user_id_filter:
-            try:
-                borrowing = borrowing.filter(user=int(user_id_filter))
-            except Exception as w:
-                raise ValidationError(w)
-
-        return borrowing
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="user_id",
+                description="The ID of the user to borrow",
+            ),
+            OpenApiParameter(
+                name="is_active",
+                description="Whether the user is active or not",
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        return response
