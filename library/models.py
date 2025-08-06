@@ -27,10 +27,7 @@ class Borrowing(models.Model):
     is_active = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
-        if self.actual_return_date:
-            self.is_active = False
-        else:
-            self.is_active = True
+        self.is_active = self.actual_return_date is None
         super().save(*args, **kwargs)
 
     def __str__(self):
